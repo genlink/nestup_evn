@@ -18,6 +18,7 @@ from .const import (
     ID_ECOST_DAILY_NEW,
     ID_ECOST_DAILY_OLD,
     ID_ECOST_MONTHLY_NEW,
+    ID_ECOST_MONTHLY_OLD,
     ID_FROM_DATE,
     ID_LATEST_UPDATE,
     ID_M_PAYMENT_NEEDED,
@@ -175,6 +176,13 @@ EVN_SENSORS: tuple[EVNSensorEntityDescription, ...] = (
         icon="mdi:cash-multiple",
         native_unit_of_measurement="VNĐ",
         value_fn=lambda data: data[ID_ECOST_MONTHLY_NEW],
+    ),
+    EVNSensorEntityDescription(
+        key=ID_ECOST_MONTHLY_OLD,
+        name="Tiền điện tháng trước",
+        icon="mdi:cash-multiple",
+        native_unit_of_measurement="VNĐ",
+        value_fn=lambda data: data[ID_ECOST_MONTHLY_OLD],
     ),
     # Total e-consumption
     EVNSensorEntityDescription(
