@@ -35,6 +35,7 @@ from .const import (
     ID_ECOST_DAILY_NEW,
     ID_ECOST_DAILY_OLD,
     ID_ECOST_MONTHLY_NEW,
+    ID_ECOST_MONTHLY_OLD,
     ID_FROM_DATE,
     ID_LATEST_UPDATE,
     ID_M_PAYMENT_NEEDED,
@@ -106,7 +107,7 @@ class EVNAPI:
             )
 
         elif evn_area.get("name") == EVN_NAME.SPC:
-            from_date, to_date = generate_datetime(monthly_start, offset=1)
+            from_date, to_date = generate_datetime(monthly_start)
             fetch_data = await self.request_update_evnspc(
                 customer_id, from_date, to_date
             )
@@ -431,10 +432,25 @@ class EVNAPI:
             else:
                 payment_status = STATUS_N_PAYMENT_NEEDED
 
-        fetched_data.update(
+        fetched_data.update( 
             {ID_PAYMENT_NEEDED: payment_status, ID_M_PAYMENT_NEEDED: m_payment_status}
         )
-
+        time_obj = datetime.now()
+        last_month = int(time_obj.strftime("%-m")) - 1
+        resp = await self._session.post(
+            url=self._evn_area.get("https://evnhanoi.vn/api/TraCuu/GetThongTinHoaDon?maDvql="+customer_id[0:6]+"&maKh="+customer_id+"&thang="+last_month+"&nam="+time_obj.strftime('%Y')+"&ky=1"),
+            headers=headers,
+        )
+        status, resp_json = await json_processing(resp)
+                if status != CONF_SUCCESS:
+            return resp_json
+        if resp_json.get("isError"):
+            return {"status": resp_json.get("code"), "data": resp_json}
+        ecost_monthly_old = 0
+        ecost_monthly_old = int(resp_json["data"]["listThongTinNoKhachHangVm"][0]["tongTien"].replace(".", "")
+        fetched_data.update( 
+            {ID_ECOST_MONTHLY_OLD: ecost_monthly_old}
+        )
         return fetched_data
 
     async def request_update_evnhcmc(self, customer_id, from_date, to_date):
