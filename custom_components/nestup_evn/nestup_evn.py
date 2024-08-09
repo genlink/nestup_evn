@@ -447,7 +447,7 @@ class EVNAPI:
         if resp_json.get("isError"):
             return {"status": resp_json.get("code"), "data": resp_json}
         ecost_monthly_old = 0
-        ecost_monthly_old = int(resp_json["data"]["listThongTinNoKhachHangVm"][0]["tongTien"].replace(".", "")
+        ecost_monthly_old = int(resp_json["data"]["listThongTinNoKhachHangVm"][0]["tongTien"].replace(".", ""))
         fetched_data.update( 
             {ID_ECOST_MONTHLY_OLD: ecost_monthly_old}
         )
