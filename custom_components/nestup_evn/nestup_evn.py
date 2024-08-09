@@ -442,7 +442,7 @@ class EVNAPI:
             headers=headers,
         )
         status, resp_json = await json_processing(resp)
-                if status != CONF_SUCCESS:
+        if status != CONF_SUCCESS:
             return resp_json
         if resp_json.get("isError"):
             return {"status": resp_json.get("code"), "data": resp_json}
