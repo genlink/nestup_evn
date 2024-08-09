@@ -435,22 +435,26 @@ class EVNAPI:
         fetched_data.update( 
             {ID_PAYMENT_NEEDED: payment_status, ID_M_PAYMENT_NEEDED: m_payment_status}
         )
+        
         time_obj = datetime.now()
         last_month = int(time_obj.strftime("%-m")) - 1
-        resp = await self._session.post(
-            url=self._evn_area.get("https://evnhanoi.vn/api/TraCuu/GetThongTinHoaDon?maDvql="+customer_id[0:6]+"&maKh="+customer_id+"&thang="+last_month+"&nam="+time_obj.strftime('%Y')+"&ky=1"),
+        last_month = str(last_month)
+        resp = await self._session.get(
+            url="https://evnhanoi.vn/api/TraCuu/GetThongTinHoaDon?maDvql="+customer_id[0:6]+"&maKh="+customer_id+"&thang="+last_month+"&nam="+time_obj.strftime('%Y')+"&ky=1",
             headers=headers,
         )
         status, resp_json = await json_processing(resp)
+        
         if status != CONF_SUCCESS:
             return resp_json
         if resp_json.get("isError"):
             return {"status": resp_json.get("code"), "data": resp_json}
         ecost_monthly_old = 0
-        ecost_monthly_old = int(resp_json["data"]["listThongTinNoKhachHangVm"][0]["tongTien"].replace(".", ""))
+        ecost_monthly_old = int(resp_json["data"]["dmThongTinHoaDonList"][0]["tongTien"].replace(".", ""))
         fetched_data.update( 
             {ID_ECOST_MONTHLY_OLD: ecost_monthly_old}
         )
+        
         return fetched_data
 
     async def request_update_evnhcmc(self, customer_id, from_date, to_date):
@@ -954,7 +958,9 @@ def formatted_result(raw_data: dict) -> dict:
     res[ID_ECON_TOTAL_OLD] = {
         "value": raw_data[ID_ECON_TOTAL_OLD],
     }
-
+    res[ID_ECOST_MONTHLY_OLD] = {
+        "value": raw_data[ID_ECOST_MONTHLY_OLD],
+    }
     if raw_data[ID_ECON_MONTHLY_NEW] is not None:
         res[ID_ECON_MONTHLY_NEW] = {
             "value": raw_data[ID_ECON_MONTHLY_NEW],
